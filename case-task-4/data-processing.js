@@ -1,22 +1,24 @@
 const fileInput = document.getElementById("fileInput");
 
-fileInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-        const content = e.target.result;
-        console.log("Данные из файла:", content);
-        processData(content);
-    };
-
-    reader.readAsText(file);
+fileInput.addEventListener("change", async ({ target }) => {
+    const file = target.files[0];
+    const content = await readFileAsText(file);
+    console.log(`Данные из файла: ${content}`);
+    processData(content);
 });
 
-function processData(data) {
+const readFileAsText = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = ({ target }) => resolve(target.result);
+        reader.readAsText(file);
+    });
+};
+
+const processData = (data) => {
     const sortedData = data.split("\n").sort((a, b) => b.localeCompare(a));
-    console.log("Отсортированные данные:", sortedData);
-}
+    console.log(`Отсортированные данные: ${sortedData}`);
+};
 
 class DataProcessor {
     constructor(data) {
@@ -29,7 +31,7 @@ class DataProcessor {
 }
 
 const realData = "Apple\nBanana\nOrange";
-console.log("Пример реальных данных:", realData);
+console.log(`Пример реальных данных: ${realData}`);
 processData(realData);
 
 const userInput = prompt("Введите данные для сохранения в файл:");
@@ -39,11 +41,11 @@ const blob = new Blob([dataToSave], { type: "text/plain" });
 
 try {
     const url = URL.createObjectURL(blob);
-    console.log("URL: ", url);
+    console.log(`URL: ${url}`);
     const link = document.createElement("a");
     link.download = "savedData.txt";
     link.href = url;
     link.click();
 } catch (error) {
-    console.error("Ошибка при создании URL:", error.message);
+    console.error(`Ошибка при создании URL: ${error.message}`);
 }
