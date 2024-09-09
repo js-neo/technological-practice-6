@@ -3,33 +3,15 @@ class DataProcessor {
         this.data = data;
     }
 
-    process() {
+    process(data = this.data) {
         console.log("Обработка данных...");
-        const processedData = this.data
+        return data
             .split(",")
             .map((item) => Array.from(item).reverse().join("").toUpperCase());
-        console.log(`Обработанные данные: ${processedData.join(", ")}`);
-
-        const processedElement = document.createElement("div");
-        processedElement.insertAdjacentHTML(
-            "beforeend",
-            `<p><span style="font-weight: bold;">Обработанные данные: </span>${processedData.join(", ")}</p>`
-        );
-        document.body.appendChild(processedElement);
     }
-    processData(data = this.data) {
-        const sortedData = data.split(",").sort((a, b) => a.localeCompare(b));
 
-        const resultElement = document.createElement("div");
-        resultElement.insertAdjacentHTML(
-            "beforeend",
-            `<p><span style="font-weight: bold;">Исходные данные: </span>${this.data}</p>`
-        );
-        resultElement.insertAdjacentHTML(
-            "beforeend",
-            `<p><span style="font-weight: bold;">Отсортированные данные: </span>${sortedData.join(", ")}</p>`
-        );
-        document.body.appendChild(resultElement);
+    sortBy(data = this.data) {
+        return data.split(",").sort((a, b) => a.localeCompare(b));
     }
 }
 
@@ -38,12 +20,13 @@ console.log(`Пример реальных данных: ${realData}`);
 const dataProcessor = new DataProcessor(realData);
 
 const fileInput = document.getElementById("fileInput");
+console.log("fileInput: ", fileInput);
 
 fileInput.addEventListener("change", async ({ target }) => {
     const file = target.files[0];
     const content = await readFileAsText(file);
     console.log(`Данные из файла: ${content}`);
-    dataProcessor.processData(content);
+    displayData("Данные из файла", content.split(", "));
 });
 
 const readFileAsText = (file) => {
@@ -54,21 +37,55 @@ const readFileAsText = (file) => {
     });
 };
 
-dataProcessor.process();
-dataProcessor.processData();
+const dataForm = document.getElementById("dataForm");
+const dataInput = document.getElementById("dataInput");
+const sortButton = document.getElementById("sortData");
+const processButton = document.getElementById("processData");
 
-const userInput = prompt("Введите данные для сохранения в файл:");
-const dataToSave = userInput || "Пользователь не ввел данные.";
+const displayData = (title, data) => {
+    const displayElement = document.createElement("div");
+    displayElement.insertAdjacentHTML(
+        "beforeend",
+        `<p><span style="font-weight: bold;">${title}: </span>${data.join(", ")}</p>`
+    );
+    document.body.appendChild(displayElement);
+};
 
-const blob = new Blob([dataToSave], { type: "text/plain" });
+sortButton.addEventListener("click", async (event) => {
+    event.preventDefault();
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+    const content = await readFileAsText(file);
+    const sortedContent = dataProcessor.sortBy(content);
+    displayData("Отсортированные данные", sortedContent);
+});
 
-try {
-    const url = URL.createObjectURL(blob);
-    console.log(`URL: ${url}`);
-    const link = document.createElement("a");
-    link.download = "savedData.txt";
-    link.href = url;
-    link.click();
-} catch (error) {
-    console.error(`Ошибка при создании URL: ${error.message}`);
-}
+processButton.addEventListener("click", async (event) => {
+    event.preventDefault();
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+    const content = await readFileAsText(file);
+    const processedData = dataProcessor.process(content);
+    displayData("Обработанные данные", processedData);
+});
+
+dataForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const userInput = dataInput.value;
+    const dataToSave = userInput || "Пользователь не ввел данные.";
+
+    const blob = new Blob([dataToSave], { type: "text/plain" });
+
+    try {
+        const url = URL.createObjectURL(blob);
+        console.log(`URL: ${url}`);
+        const link = document.createElement("a");
+        link.download = "savedData.txt";
+        link.href = url;
+        link.click();
+        dataInput.value = "";
+    } catch (error) {
+        console.error(`Ошибка при создании URL: ${error.message}`);
+    }
+});
