@@ -29,7 +29,8 @@ fileInput.addEventListener("change", async ({ target }) => {
     displayData("Данные из файла", content.split(", "));
 });
 
-const readFile = async (method) => {
+const readFile = async (e, method) => {
+    e.preventDefault();
     const fileInput = document.getElementById("fileInput");
     const file = fileInput.files[0];
     const content = await readFileAsText(file);
@@ -58,13 +59,13 @@ const displayData = (title, data) => {
     document.body.appendChild(displayElement);
 };
 
-sortButton.addEventListener("click", async () => {
-    const sortedContent = await readFile("sortBy");
+sortButton.addEventListener("click", async (event) => {
+    const sortedContent = await readFile(event, "sortBy");
     displayData("Отсортированные данные", sortedContent);
 });
 
-processButton.addEventListener("click", async () => {
-    const processedData = await readFile("process");
+processButton.addEventListener("click", async (event) => {
+    const processedData = await readFile(event, "process");
     displayData("Обработанные данные", processedData);
 });
 
