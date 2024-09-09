@@ -5,9 +5,10 @@ class DataProcessor {
 
     process(data = this.data) {
         console.log("Обработка данных...");
-        return data
-            .split(",")
-            .map((item) => Array.from(item).reverse().join("").toUpperCase());
+        return data.split(",").map((item) => {
+            console.log("item: ", item);
+            return Array.from(item.toUpperCase()).reverse().join("");
+        });
     }
 
     sortBy(data = this.data) {
@@ -25,9 +26,15 @@ console.log("fileInput: ", fileInput);
 fileInput.addEventListener("change", async ({ target }) => {
     const file = target.files[0];
     const content = await readFileAsText(file);
-    console.log(`Данные из файла: ${content}`);
     displayData("Данные из файла", content.split(", "));
 });
+
+const readFile = async (method) => {
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+    const content = await readFileAsText(file);
+    return dataProcessor[method](content);
+};
 
 const readFileAsText = (file) => {
     return new Promise((resolve, reject) => {
@@ -51,21 +58,13 @@ const displayData = (title, data) => {
     document.body.appendChild(displayElement);
 };
 
-sortButton.addEventListener("click", async (event) => {
-    event.preventDefault();
-    const fileInput = document.getElementById("fileInput");
-    const file = fileInput.files[0];
-    const content = await readFileAsText(file);
-    const sortedContent = dataProcessor.sortBy(content);
+sortButton.addEventListener("click", async () => {
+    const sortedContent = await readFile("sortBy");
     displayData("Отсортированные данные", sortedContent);
 });
 
-processButton.addEventListener("click", async (event) => {
-    event.preventDefault();
-    const fileInput = document.getElementById("fileInput");
-    const file = fileInput.files[0];
-    const content = await readFileAsText(file);
-    const processedData = dataProcessor.process(content);
+processButton.addEventListener("click", async () => {
+    const processedData = await readFile("process");
     displayData("Обработанные данные", processedData);
 });
 
