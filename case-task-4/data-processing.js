@@ -1,10 +1,49 @@
+class DataProcessor {
+    constructor(data) {
+        this.data = data;
+    }
+
+    process() {
+        console.log("Обработка данных...");
+        const processedData = this.data
+            .split(",")
+            .map((item) => Array.from(item).reverse().join("").toUpperCase());
+        console.log(`Обработанные данные: ${processedData.join(", ")}`);
+
+        const processedElement = document.createElement("div");
+        processedElement.insertAdjacentHTML(
+            "beforeend",
+            `<p><span style="font-weight: bold;">Обработанные данные: </span>${processedData.join(", ")}</p>`
+        );
+        document.body.appendChild(processedElement);
+    }
+    processData(data = this.data) {
+        const sortedData = data.split(",").sort((a, b) => a.localeCompare(b));
+
+        const resultElement = document.createElement("div");
+        resultElement.insertAdjacentHTML(
+            "beforeend",
+            `<p><span style="font-weight: bold;">Исходные данные: </span>${this.data}</p>`
+        );
+        resultElement.insertAdjacentHTML(
+            "beforeend",
+            `<p><span style="font-weight: bold;">Отсортированные данные: </span>${sortedData.join(", ")}</p>`
+        );
+        document.body.appendChild(resultElement);
+    }
+}
+
+const realData = "Orange,Banana,Apple";
+console.log(`Пример реальных данных: ${realData}`);
+const dataProcessor = new DataProcessor(realData);
+
 const fileInput = document.getElementById("fileInput");
 
 fileInput.addEventListener("change", async ({ target }) => {
     const file = target.files[0];
     const content = await readFileAsText(file);
     console.log(`Данные из файла: ${content}`);
-    processData(content);
+    dataProcessor.processData(content);
 });
 
 const readFileAsText = (file) => {
@@ -15,24 +54,8 @@ const readFileAsText = (file) => {
     });
 };
 
-const processData = (data) => {
-    const sortedData = data.split("\n").sort((a, b) => b.localeCompare(a));
-    console.log(`Отсортированные данные: ${sortedData}`);
-};
-
-class DataProcessor {
-    constructor(data) {
-        this.data = data;
-    }
-
-    process() {
-        console.log("Обработка данных...");
-    }
-}
-
-const realData = "Apple\nBanana\nOrange";
-console.log(`Пример реальных данных: ${realData}`);
-processData(realData);
+dataProcessor.process();
+dataProcessor.processData();
 
 const userInput = prompt("Введите данные для сохранения в файл:");
 const dataToSave = userInput || "Пользователь не ввел данные.";
