@@ -1,3 +1,5 @@
+import { Histogram } from "./histograms.js";
+
 class DataProcessor {
     constructor(data) {
         this.data = data;
@@ -6,24 +8,53 @@ class DataProcessor {
     process(data = this.data) {
         console.log("Обработка данных...");
         return data.split(",").map((item) => {
-            console.log("item: ", item);
             return Array.from(item.toUpperCase()).reverse().join("");
         });
     }
 
     sortBy(data = this.data) {
-        return data.split(",").sort((a, b) => a.localeCompare(b));
+        console.log("Сортировка данных...");
+        return data
+            .replace(/[.,!? ]/g, "")
+            .split("")
+            .sort((a, b) => a.localeCompare(b));
+    }
+
+    getHistogram(data = this.data) {
+        console.log("Создание гистограммы данных...");
+        const histogram = new Histogram();
+        histogram.add(data);
+        return histogram.generateHistogramStrings();
     }
 }
 
-const realData = "Orange,Banana,Apple";
+const dataForm = document.getElementById("dataForm");
+const dataInput = document.getElementById("dataInput");
+const outputDiv = document.getElementById("output");
+const saveButton = dataForm.querySelector("button[type='submit']");
+const sortButton = document.getElementById("sortData");
+const processButton = document.getElementById("processData");
+const histogramButton = document.getElementById("histogramData");
+
+const displayData = (title, data, label = "info") => {
+    const displayElement = document.createElement("div");
+    displayElement.id = label;
+    displayElement.insertAdjacentHTML(
+        "beforeend",
+        `<p><span style="font-weight: bold;">${title}: </span>${data.join(", ")}</p>`
+    );
+    outputDiv.appendChild(displayElement);
+};
+
+const realData = "Orange, Banana, Apple";
 console.log(`Пример реальных данных: ${realData}`);
+displayData("Пример реальных данных", realData.split(", "), "init");
 const dataProcessor = new DataProcessor(realData);
 
 const fileInput = document.getElementById("fileInput");
-console.log("fileInput: ", fileInput);
 
 fileInput.addEventListener("change", async ({ target }) => {
+    outputDiv.textContent = "";
     const file = target.files[0];
     const content = await readFileAsText(file);
     displayData("Данные из файла", content.split(", "));
@@ -32,9 +63,12 @@ fileInput.addEventListener("change", async ({ target }) => {
 const readFile = async (e, method) => {
     e.preventDefault();
     const fileInput = document.getElementById("fileInput");
+    const initialInfo = document.getElementById("init");
     const file = fileInput.files[0];
-    const content = await readFileAsText(file);
-    return dataProcessor[method](content);
+    const content = file && (await readFileAsText(file));
+    if (!content && !initialInfo)
+        displayData("Пример реальных данных", realData.split(", "), "init");
+    return content ? dataProcessor[method](content) : dataProcessor[method]();
 };
 
 const readFileAsText = (file) => {
@@ -43,20 +77,6 @@ const readFileAsText = (file) => {
         reader.onload = ({ target }) => resolve(target.result);
         reader.readAsText(file);
     });
-};
-
-const dataForm = document.getElementById("dataForm");
-const dataInput = document.getElementById("dataInput");
-const sortButton = document.getElementById("sortData");
-const processButton = document.getElementById("processData");
-
-const displayData = (title, data) => {
-    const displayElement = document.createElement("div");
-    displayElement.insertAdjacentHTML(
-        "beforeend",
-        `<p><span style="font-weight: bold;">${title}: </span>${data.join(", ")}</p>`
-    );
-    document.body.appendChild(displayElement);
 };
 
 sortButton.addEventListener("click", async (event) => {
@@ -68,9 +88,20 @@ processButton.addEventListener("click", async (event) => {
     const processedData = await readFile(event, "process");
     displayData("Обработанные данные", processedData);
 });
+histogramButton.addEventListener("click", async (event) => {
+    const histogramContent = await readFile(event, "getHistogram");
+    const content = histogramContent.reduce((result, item) => {
+        result += `<p>${item}</p>`;
+        return result;
+    }, "<h4>Гистограмма данных: </h4>");
+    outputDiv.insertAdjacentHTML("beforeend", content);
+});
 
 dataForm.addEventListener("submit", (e) => {
     e.preventDefault();
+
+    outputDiv.textContent = "";
+    displayData("Пример реальных данных", realData.split(", "), "init");
 
     const userInput = dataInput.value;
     const dataToSave = userInput || "Пользователь не ввел данные.";
@@ -79,7 +110,6 @@ dataForm.addEventListener("submit", (e) => {
 
     try {
         const url = URL.createObjectURL(blob);
-        console.log(`URL: ${url}`);
         const link = document.createElement("a");
         link.download = "savedData.txt";
         link.href = url;

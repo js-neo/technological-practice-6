@@ -9,10 +9,10 @@
 </head>
 <body>
 <div class="container mt-4">
-    <div class="flex-column w-50">
+    <div class="flex-column w-75">
         <form id="dataForm" class="form-control d-flex justify-content-between align-items-center">
             <label for="dataInput">Введите данные для сохранения в файл:</label>
-            <input id="dataInput" type="text" name="dataInput">
+            <input id="dataInput" class="w-50" type="text" name="dataInput">
             <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
         <form id="fileForm" class="form-control d-flex justify-content-between mt-4 align-items-center">
@@ -20,13 +20,15 @@
             <div>
                 <button class="btn btn-primary" id="sortData">Сортировка</button>
                 <button class="btn btn-primary" id="processData">Обработка</button>
+                <button class="btn btn-primary" id="histogramData">Гистограмма</button>
             </div>
         </form>
     </div>
+    <div id="output" class="mt-4"></div>
 
 </div>
 
-
-<script src="data-processing.js"></script>
+<script src="histograms.js" type="module"></script>
+<script src="data-processing.js" type="module"></script>
 </body>
 </html>
