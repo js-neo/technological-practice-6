@@ -6,25 +6,51 @@ class DataProcessor {
     }
 
     process(data = this.data) {
-        console.log("Обработка данных...");
-        return data.split(",").map((item) => {
-            return Array.from(item.toUpperCase()).reverse().join("");
-        });
+        try {
+            console.log("Обработка данных...");
+            if (!data) {
+                throw new Error("Отсутствуют данные для обработки.");
+            }
+            return data.split(",").map((item) => {
+                return Array.from(item.toUpperCase()).reverse().join("");
+            });
+        } catch (error) {
+            console.error(`Ошибка при обработке данных: ${error.message}`);
+            return [];
+        }
     }
 
     sortBy(data = this.data) {
-        console.log("Сортировка данных...");
-        return data
-            .replace(/[.,!? ]/g, "")
-            .split("")
-            .sort((a, b) => a.localeCompare(b));
+        try {
+            console.log("Сортировка данных...");
+            if (!data) {
+                throw new Error("Отсутствуют данные для сортировки.");
+            }
+            return data
+                .replace(/[.,!? ]/g, "")
+                .split("")
+                .sort((a, b) => a.localeCompare(b));
+        } catch (error) {
+            console.error(`Ошибка при сортировке данных: ${error.message}`);
+            return [];
+        }
     }
 
     getHistogram(data = this.data) {
-        console.log("Создание гистограммы данных...");
-        const histogram = new Histogram();
-        histogram.add(data);
-        return histogram.generateHistogramStrings();
+        try {
+            console.log("Создание гистограммы данных...");
+            if (!data) {
+                throw new Error("Отсутствуют данные для создания гистограммы.");
+            }
+            const histogram = new Histogram();
+            histogram.add(data);
+            return histogram.generateHistogramStrings();
+        } catch (error) {
+            console.error(
+                `Ошибка при создании гистограммы данных: ${error.message}`
+            );
+            return [];
+        }
     }
 }
 
