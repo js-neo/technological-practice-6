@@ -118,14 +118,15 @@ const readFile = async (e, method) => {
     const fileInput = document.getElementById("fileInput");
     const initialInfo = document.getElementById("init");
     const file = fileInput.files[0];
-    const content = file && (await readFileAsText(file));
+    const content = file ? await readFileAsText(file) : null;
     if (!content && !initialInfo)
         displayData("Пример реальных данных", realData.split(", "), "init");
-    if (method === "filteredBy")
-        return content
-            ? dataProcessor[method](content, stringToRemove)
-            : dataProcessor[method](undefined, stringToRemove);
-    return content ? dataProcessor[method](content) : dataProcessor[method]();
+    const args =
+        method === "filteredBy"
+            ? [content || undefined, stringToRemove]
+            : [content];
+
+    return dataProcessor[method](...args);
 };
 
 const readFileAsText = (file) => {
