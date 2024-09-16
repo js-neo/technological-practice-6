@@ -5,70 +5,68 @@ class DataProcessor {
         this.data = data;
     }
 
+    checkData(data) {
+        if (!data) {
+            throw new Error("Отсутствуют данные для обработки.");
+        }
+    }
+
+    handleError(action, error) {
+        console.error(`Ошибка при ${action} данных: ${error.message}`);
+        return [];
+    }
+
     process(data = this.data) {
         try {
             console.log("Обработка данных...");
-            if (!data) {
-                throw new Error("Отсутствуют данные для обработки.");
-            }
-            return data.split(",").map((item) => {
-                return Array.from(item.toUpperCase()).reverse().join("");
-            });
+            this.checkData(data);
+            return data
+                .split(",")
+                .map((item) => [...item.toUpperCase()].reverse().join(""));
         } catch (error) {
-            console.error(`Ошибка при обработке данных: ${error.message}`);
-            return [];
+            this.handleError("обработке", error);
         }
     }
 
     sortBy(data = this.data) {
         try {
             console.log("Сортировка данных...");
-            if (!data) {
-                throw new Error("Отсутствуют данные для сортировки.");
-            }
+            this.checkData(data);
             return data
                 .replace(/[.,!? ]/g, "")
                 .split("")
                 .sort((a, b) => a.localeCompare(b));
         } catch (error) {
-            console.error(`Ошибка при сортировке данных: ${error.message}`);
-            return [];
+            this.handleError("сортировке", error);
         }
     }
 
     filteredBy(data = this.data, filter) {
         try {
             console.log("Фильтрация данных...");
-            if (!data) {
-                throw new Error("Отсутствуют данные для фильтрации.");
+            this.checkData(data);
+            if (!filter) {
+                throw new Error("Фильтр не задан");
             }
             return data.split(",").filter((item) => {
-                console.log("item: ", item);
-                console.log("filter: ", filter);
                 return (
                     item.trim().toLowerCase() !== filter.trim().toLowerCase()
                 );
             });
         } catch (error) {
-            console.log(`Ошибка при фильтрации данных: ${error.message}`);
-            return [];
+            this.handleError("фильтрации", error);
         }
     }
 
     getHistogram(data = this.data) {
         try {
             console.log("Создание гистограммы данных...");
-            if (!data) {
-                throw new Error("Отсутствуют данные для создания гистограммы.");
-            }
+            this.checkData(data);
             const histogram = new Histogram();
             histogram.add(data);
             return histogram.generateHistogramStrings();
         } catch (error) {
-            console.error(
-                `Ошибка при создании гистограммы данных: ${error.message}`
-            );
-            return [];
+            this.handleError("создании гистограммы", error);
         }
     }
 }
@@ -89,6 +87,38 @@ let stringToRemove = null;
 
 showText.textContent = `${stringToRemove ? stringToRemove : "не задан"}`;
 
+const displayDataProcessing = (method, content) => {
+    let title = "";
+
+    switch (method) {
+        case "process":
+            title = "Обработанные данные";
+            break;
+        case "getHistogram":
+            title = "Гистограмма данных";
+            break;
+        case "sortBy":
+            title = "Отсортированные данные";
+            break;
+        case "filteredBy":
+            title = "Отфильтрованные данные";
+            break;
+        default:
+            title = "Неизвестный метод";
+            break;
+    }
+
+    if (method === "getHistogram") {
+        const histogramContent = content.reduce((result, item) => {
+            result += `<p>${item}</p>`;
+            return result;
+        }, `<h4>${title}: </h4>`);
+        outputDiv.insertAdjacentHTML("beforeend", histogramContent);
+    } else {
+        displayData(title, content);
+    }
+};
+
 const displayData = (title, data, label = "info") => {
     const displayElement = document.createElement("div");
     displayElement.id = label;
@@ -99,8 +129,14 @@ const displayData = (title, data, label = "info") => {
     outputDiv.appendChild(displayElement);
 };
 
+const handleDataEvent = async (event, method) => {
+    const content = await readFile(event, method);
+    displayDataProcessing(method, content);
+};
+
 const realData = "Orange, Banana, Apple";
 console.log(`Пример реальных данных: ${realData}`);
+
 displayData("Пример реальных данных", realData.split(", "), "init");
 const dataProcessor = new DataProcessor(realData);
 
@@ -137,28 +173,18 @@ const readFileAsText = (file) => {
     });
 };
 
-sortButton.addEventListener("click", async (event) => {
-    const sortedContent = await readFile(event, "sortBy");
-    displayData("Отсортированные данные", sortedContent);
-});
-
-processButton.addEventListener("click", async (event) => {
-    const processedData = await readFile(event, "process");
-    displayData("Обработанные данные", processedData);
-});
-histogramButton.addEventListener("click", async (event) => {
-    const histogramContent = await readFile(event, "getHistogram");
-    const content = histogramContent.reduce((result, item) => {
-        result += `<p>${item}</p>`;
-        return result;
-    }, "<h4>Гистограмма данных: </h4>");
-    outputDiv.insertAdjacentHTML("beforeend", content);
-});
-
-filterButton.addEventListener("click", async (event) => {
-    const filteredContent = await readFile(event, "filteredBy");
-    displayData("Отфильтрованные данные", filteredContent);
-});
+sortButton.addEventListener("click", (event) =>
+    handleDataEvent(event, "sortBy")
+);
+processButton.addEventListener("click", (event) =>
+    handleDataEvent(event, "process")
+);
+histogramButton.addEventListener("click", (event) =>
+    handleDataEvent(event, "getHistogram")
+);
+filterButton.addEventListener("click", (event) =>
+    handleDataEvent(event, "filteredBy")
+);
 
 dataForm.addEventListener("submit", (e) => {
     e.preventDefault();
