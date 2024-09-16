@@ -36,6 +36,25 @@ class DataProcessor {
         }
     }
 
+    filteredBy(data = this.data, filter) {
+        try {
+            console.log("Фильтрация данных...");
+            if (!data) {
+                throw new Error("Отсутствуют данные для фильтрации.");
+            }
+            return data.split(",").filter((item) => {
+                console.log("item: ", item);
+                console.log("filter: ", filter);
+                return (
+                    item.trim().toLowerCase() !== filter.trim().toLowerCase()
+                );
+            });
+        } catch (error) {
+            console.log(`Ошибка при фильтрации данных: ${error.message}`);
+            return [];
+        }
+    }
+
     getHistogram(data = this.data) {
         try {
             console.log("Создание гистограммы данных...");
@@ -61,6 +80,14 @@ const saveButton = dataForm.querySelector("button[type='submit']");
 const sortButton = document.getElementById("sortData");
 const processButton = document.getElementById("processData");
 const histogramButton = document.getElementById("histogramData");
+const dataSubstring = document.getElementById("dataSubstring");
+const substringInput = document.getElementById("substringInput");
+const showText = document.getElementById("showText");
+const filterButton = document.getElementById("filterButton");
+
+let stringToRemove = null;
+
+showText.textContent = `${stringToRemove ? stringToRemove : "не задан"}`;
 
 const displayData = (title, data, label = "info") => {
     const displayElement = document.createElement("div");
@@ -94,6 +121,10 @@ const readFile = async (e, method) => {
     const content = file && (await readFileAsText(file));
     if (!content && !initialInfo)
         displayData("Пример реальных данных", realData.split(", "), "init");
+    if (method === "filteredBy")
+        return content
+            ? dataProcessor[method](content, stringToRemove)
+            : dataProcessor[method](undefined, stringToRemove);
     return content ? dataProcessor[method](content) : dataProcessor[method]();
 };
 
@@ -123,6 +154,11 @@ histogramButton.addEventListener("click", async (event) => {
     outputDiv.insertAdjacentHTML("beforeend", content);
 });
 
+filterButton.addEventListener("click", async (event) => {
+    const filteredContent = await readFile(event, "filteredBy");
+    displayData("Отфильтрованные данные", filteredContent);
+});
+
 dataForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -144,4 +180,12 @@ dataForm.addEventListener("submit", (e) => {
     } catch (error) {
         console.error(`Ошибка при создании URL: ${error.message}`);
     }
+});
+
+dataSubstring.addEventListener("submit", (event) => {
+    event.preventDefault();
+    stringToRemove = substringInput.value;
+    console.log("stringToRemove: ", stringToRemove);
+    showText.textContent = `${stringToRemove ? stringToRemove : "не задан"}`;
+    substringInput.value = "";
 });

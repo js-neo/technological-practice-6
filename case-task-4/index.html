@@ -34,6 +34,16 @@
             </form>
         </div>
     </div>
+     <div class="row">
+        <div class="col">
+            <form id="dataSubstring" class="input-group mb-3">
+                <label for="substringInput" class="input-group-text">Введите строку, которую нужно удалить из отображаемых данных:</label>
+                <input id="substringInput" class="form-control" type="text" name="substringInput">
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
     <div class="row mt-4">
         <div class="col">
             <form id="fileForm" class="input-group mb-3">
@@ -44,6 +54,12 @@
                     <button class="btn btn-primary border-start" id="histogramData">Гистограмма</button>
                 </div>
             </form>
+        </div>
+    </div>
+    <div id="stringToDelete">
+        <div class="d-flex">
+            <p class="me-2"><span class="fw-bold">Фильтр: </span><span id="showText"></span></p>
+            <button id="filterButton" class="btn btn-primary">Фильтрация</button>
         </div>
     </div>
     <div id="output" class="mt-4"></div>
