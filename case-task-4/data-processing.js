@@ -49,6 +49,7 @@ class DataProcessor {
                 throw new Error("Фильтр не задан");
             }
             const words = filter.split(" ").join("|");
+            console.log("words: ", words);
             const regex = new RegExp(words, "gi");
             return [data.replace(regex, "\u{1F47D}")];
         } catch (error) {
