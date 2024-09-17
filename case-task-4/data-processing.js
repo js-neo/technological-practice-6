@@ -24,7 +24,7 @@ class DataProcessor {
                 .split(",")
                 .map((item) => [...item.toUpperCase()].reverse().join(""));
         } catch (error) {
-            this.handleError("обработке", error);
+            return this.handleError("обработке", error);
         }
     }
 
@@ -37,7 +37,7 @@ class DataProcessor {
                 .split("")
                 .sort((a, b) => a.localeCompare(b));
         } catch (error) {
-            this.handleError("сортировке", error);
+            return this.handleError("сортировке", error);
         }
     }
 
@@ -48,9 +48,10 @@ class DataProcessor {
             if (!filter) {
                 throw new Error("Фильтр не задан");
             }
-            return [data.replaceAll(filter, "\u{1F47D}")];
+            const regex = new RegExp(filter, "gi");
+            return [data.replaceAll(regex, "\u{1F47D}")];
         } catch (error) {
-            this.handleError("фильтрации", error);
+            return this.handleError("фильтрации", error);
         }
     }
 
@@ -62,7 +63,7 @@ class DataProcessor {
             histogram.add(data);
             return histogram.generateHistogramStrings();
         } catch (error) {
-            this.handleError("создании гистограммы", error);
+            return this.handleError("создании гистограммы", error);
         }
     }
 }
