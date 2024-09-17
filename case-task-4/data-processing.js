@@ -48,10 +48,11 @@ class DataProcessor {
             if (!filter) {
                 throw new Error("Фильтр не задан");
             }
-            const words = filter.split(" ").join("|");
-            console.log("words: ", words);
-            const regex = new RegExp(words, "gi");
-            return [data.replace(regex, "\u{1F47D}")];
+            const escapeRegExp = (str) =>
+                str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const escapedSubstring = escapeRegExp(filter);
+            const regex = new RegExp(escapedSubstring, "gi");
+            return [data.replace(regex, "").trim()];
         } catch (error) {
             return this.handleError("фильтрации", error);
         }
@@ -84,7 +85,7 @@ const filterButton = document.getElementById("filterButton");
 
 let stringToRemove = null;
 
-showText.textContent = `${stringToRemove ? stringToRemove : "не задан"}`;
+showText.textContent = `${stringToRemove ? stringToRemove : "Не введена подстрока для фильтрации данных"}`;
 
 const displayDataProcessing = (method, content) => {
     let title = "";
@@ -212,6 +213,6 @@ dataSubstring.addEventListener("submit", (event) => {
     event.preventDefault();
     stringToRemove = substringInput.value;
     console.log("stringToRemove: ", stringToRemove);
-    showText.textContent = `${stringToRemove ? stringToRemove : "не задан"}`;
+    showText.textContent = `${stringToRemove ? stringToRemove : "Не введена подстрока для фильтрации данных"}`;
     substringInput.value = "";
 });

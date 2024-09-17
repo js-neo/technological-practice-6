@@ -9,9 +9,11 @@
         #stringToDelete {
             border: 1px solid #ced4da; /* Цвет границы */
             border-radius: 5px; /* Скругление углов */
+            margin-top: 20px; /* Отступ сверху */
+        }
+        #label {
             padding-left: 10px; /* Отступ слева */
             background-color: #f8f9fa; /* Цвет фона */
-            margin-top: 20px; /* Отступ сверху */
         }
     </style>
     <title>Data Processing</title>
@@ -66,12 +68,16 @@
             </form>
         </div>
     </div>
-    <div id="stringToDelete">
-        <div class="d-flex align-items-center justify-content-between">
-            <p class="me-2 mb-0"><span class="fw-bold me-3">Фильтр: </span><span id="showText"></span></p>
+    <div id="stringToDelete" style="height: 42px;">
+        <div class="d-flex align-items-center justify-content-between h-100">
+            <div class="h-100 w-100 d-flex me-2">
+                <div id="label" class="me-3 pe-5 border-end align-content-center"><span>Фильтр: </span></div>
+                <div class="align-content-center" id="showText"></div>
+            </div>
             <button id="filterButton" class="btn btn-primary">Фильтрация</button>
         </div>
     </div>
+
     <div id="output" class="mt-4"></div>
 </div>
 
