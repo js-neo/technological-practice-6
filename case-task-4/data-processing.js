@@ -48,11 +48,7 @@ class DataProcessor {
             if (!filter) {
                 throw new Error("Фильтр не задан");
             }
-            return data.split(",").filter((item) => {
-                return (
-                    item.trim().toLowerCase() !== filter.trim().toLowerCase()
-                );
-            });
+            return [data.replaceAll(filter, "\u{1F47D}")];
         } catch (error) {
             this.handleError("фильтрации", error);
         }
