@@ -1,1 +1,4 @@
-[{"description":"Complete task management app","completed":true}]
+{
+  "$schema": "./arraySchema.json",
+  "tasks": []
+}
