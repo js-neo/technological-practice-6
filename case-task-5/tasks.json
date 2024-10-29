@@ -1,4 +1,25 @@
 {
   "$schema": "./arraySchema.json",
-  "tasks": []
+  "tasks": [
+    {
+      "description": "купить мудрость",
+      "completed": false
+    },
+    {
+      "description": "Учисть правильно писать код!",
+      "completed": false
+    },
+    {
+      "description": "купить мозги",
+      "completed": true
+    },
+    {
+      "description": "купить что-то полезное",
+      "completed": true
+    },
+    {
+      "description": "Читай умные книги!",
+      "completed": false
+    }
+  ]
 }
